@@ -1,5 +1,7 @@
 # AI 代码审查助手
 
+[![CI](https://github.com/ZHANGg236/ai-code-review-assistant/actions/workflows/ci.yml/badge.svg)](https://github.com/ZHANGg236/ai-code-review-assistant/actions/workflows/ci.yml)
+
 一个可以直接给别人用的网页工具：粘贴代码，选择语言，几秒内获得性能、安全与代码规范建议。
 
 后端使用 FastAPI，模型调用 DeepSeek Chat Completions API。前端是原生 HTML/CSS/JS，不需要 Node.js 构建。
