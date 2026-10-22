@@ -1,0 +1,21 @@
+# 本地数据
+data/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# 环境变量（不要提交真实密钥）
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+
+# 系统文件
+.DS_Store
+Thumbs.db

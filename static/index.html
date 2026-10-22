@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="description" content="AI 代码审查助手：粘贴代码，快速获得性能、安全与规范建议。">
+    <title>AI 代码审查助手</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="app" class="app" hidden>
+        <header class="topbar">
+            <div class="brand">
+                <div class="logo" aria-hidden="true">AI</div>
+                <div class="brand-text">
+                    <h1>AI 代码审查助手</h1>
+                    <p>粘贴代码，快速获得性能、安全与规范建议</p>
+                </div>
+            </div>
+            <div class="topbar-actions">
+                <span id="model-badge" class="badge">deepseek</span>
+                <button id="history-btn" type="button" class="btn btn-ghost">历史</button>
+                <button id="logout-btn" type="button" class="btn btn-ghost" hidden>退出</button>
+            </div>
+        </header>
+
+        <main class="workspace">
+            <section class="panel editor-panel" aria-label="代码输入">
+                <div class="panel-head">
+                    <div class="field">
+                        <label for="task">场景</label>
+                        <select id="task">
+                            <option value="review">普通审查</option>
+                            <option value="problem">编程题</option>
+                            <option value="test_framework">自动化测试</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="language">语言</label>
+                        <select id="language">
+                            <option value="python">Python</option>
+                            <option value="javascript">JavaScript</option>
+                            <option value="typescript">TypeScript</option>
+                            <option value="java">Java</option>
+                            <option value="go">Go</option>
+                            <option value="c">C</option>
+                            <option value="cpp">C++</option>
+                            <option value="csharp">C#</option>
+                            <option value="rust">Rust</option>
+                            <option value="php">PHP</option>
+                            <option value="ruby">Ruby</option>
+                            <option value="kotlin">Kotlin</option>
+                            <option value="swift">Swift</option>
+                            <option value="sql">SQL</option>
+                            <option value="bash">Bash</option>
+                            <option value="html">HTML</option>
+                            <option value="css">CSS</option>
+                            <option value="vue">Vue</option>
+                            <option value="react">React</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                    <div class="head-actions">
+                        <button id="folder-btn" type="button" class="btn btn-ghost" title="上传 .zip 分析整个文件夹">文件夹</button>
+                        <input id="folder-input" type="file" accept=".zip,application/zip" hidden>
+                        <button id="sample-btn" type="button" class="btn btn-ghost">示例</button>
+                        <button id="clear-btn" type="button" class="btn btn-ghost">清空</button>
+                    </div>
+                </div>
+
+                <div id="problem-wrap" class="problem-wrap" hidden>
+                    <div class="problem-head">
+                        <label for="problem">题目描述</label>
+                        <span>编程题模式：会对照题目检查正确性、边界和复杂度</span>
+                    </div>
+                    <textarea id="problem" spellcheck="false"
+                        placeholder="粘贴题目描述、输入输出示例、约束条件……"></textarea>
+                </div>
+
+                <textarea id="code" spellcheck="false" autocomplete="off"
+                    placeholder="在这里粘贴需要审查的代码……&#10;&#10;例如：&#10;def get_user(username):&#10;    query = &quot;SELECT * FROM users WHERE name = '&quot; + username + &quot;'&quot;&#10;    return db.execute(query)"></textarea>
+
+                <div class="editor-foot">
+                    <div id="mode-switch" class="mode-switch" role="group" aria-label="审查模式">
+                        <button type="button" data-mode="quick" class="active" aria-pressed="true" title="只输出结论和 Top 3 问题，速度更快">快速</button>
+                        <button type="button" data-mode="deep" aria-pressed="false" title="输出更完整的审查报告，耗时更长">深度</button>
+                    </div>
+                    <span id="char-count" class="char-count">0 / 20000</span>
+                    <span id="status" class="status" role="status" aria-live="polite">准备就绪</span>
+                    <button id="review-btn" type="button" class="btn btn-primary">
+                        开始审查 <span class="shortcut">Ctrl ↵</span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="panel result-panel" aria-label="审查结果">
+                <div class="panel-head">
+                    <h2>审查结果</h2>
+                    <div class="head-actions">
+                        <button id="fix-btn" type="button" class="btn btn-ghost" disabled>修复代码</button>
+                        <button id="copy-btn" type="button" class="btn btn-ghost" disabled>复制</button>
+                        <button id="download-btn" type="button" class="btn btn-ghost" disabled>下载 .md</button>
+                    </div>
+                </div>
+                <div id="feedback-bar" class="feedback-bar" hidden>
+                    <span>这次审查有帮助吗？</span>
+                    <button type="button" data-verdict="helpful" class="btn btn-ghost">有用</button>
+                    <button type="button" data-verdict="false_positive" class="btn btn-ghost">误报</button>
+                    <button type="button" data-verdict="fixed" class="btn btn-ghost">已修复</button>
+                </div>
+                <div id="result" class="result markdown">
+                    <div class="empty-state">
+                        <div class="empty-icon" aria-hidden="true">⌁</div>
+                        <p>审查结果会显示在这里</p>
+                        <span>快速模式先给结论和 Top 3 问题，需要完整报告可切换到“深度”</span>
+                        <span>支持 Python、Java、JavaScript、Go、SQL 等语言</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <span>AI 审查结果仅供参考，请结合人工判断。</span>
+            <span>代码仅用于本次审查，不在服务端保存。</span>
+        </footer>
+    </div>
+
+    <div id="login-overlay" class="overlay" hidden>
+        <form id="login-form" class="login-card">
+            <div class="logo large" aria-hidden="true">AI</div>
+            <h2>访问验证</h2>
+            <p>请输入访问密码后开始使用</p>
+            <input id="password" type="password" placeholder="访问密码" autocomplete="current-password" required>
+            <button type="submit" class="btn btn-primary btn-block">进入</button>
+            <p id="login-error" class="error-text" role="alert" hidden></p>
+        </form>
+    </div>
+
+    <div id="fix-overlay" class="overlay" hidden>
+        <div class="fix-card">
+            <div class="fix-head">
+                <div>
+                    <h2>修复建议</h2>
+                    <p>AI 生成的修复建议，请人工确认并测试后再使用。</p>
+                </div>
+                <button id="fix-close-btn" type="button" class="btn btn-ghost">关闭</button>
+            </div>
+            <pre id="fix-code" class="fix-code"></pre>
+            <details class="fix-details">
+                <summary>修改说明</summary>
+                <pre id="fix-explanation" class="fix-explanation"></pre>
+            </details>
+            <div class="fix-actions">
+                <button id="fix-copy-btn" type="button" class="btn btn-ghost">复制代码</button>
+                <button id="fix-apply-btn" type="button" class="btn btn-primary">替换编辑器</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="history-overlay" class="overlay" hidden>
+        <div class="history-card">
+            <div class="fix-head">
+                <div>
+                    <h2>审查历史</h2>
+                    <p id="history-stats">加载中…</p>
+                </div>
+                <button id="history-close-btn" type="button" class="btn btn-ghost">关闭</button>
+            </div>
+            <div class="history-body">
+                <div id="history-list" class="history-list"></div>
+                <div id="history-detail" class="history-detail markdown">选择一条记录查看详情</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js" defer></script>
+    <script src="/static/app.js" defer></script>
+</body>
+</html>

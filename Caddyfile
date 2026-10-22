@@ -1,0 +1,11 @@
+# 把 your-domain.com 替换成解析到这台服务器的域名。
+# 只是想本地测试、不走 HTTPS 时，可以把域名改成 :80。
+your-domain.com {
+    encode gzip
+
+    request_body {
+        max_size 1MB
+    }
+
+    reverse_proxy app:8000
+}
