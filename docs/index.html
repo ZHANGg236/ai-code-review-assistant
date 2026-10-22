@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="张道银的项目作品集：AI 代码审查助手与 Pytest 接口自动化测试框架。">
+  <title>张道银｜项目作品集</title>
+  <style>
+    :root {
+      --bg: #080b12;
+      --panel: #0f1522;
+      --panel-2: #121a2a;
+      --text: #eef2ff;
+      --muted: #94a1b8;
+      --line: rgba(255, 255, 255, 0.09);
+      --accent: #6f9bff;
+      --accent-2: #9cc0ff;
+      --green: #59d49a;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 15% -10%, rgba(76, 118, 214, 0.25), transparent 60%),
+        radial-gradient(700px 500px at 90% 20%, rgba(55, 86, 160, 0.18), transparent 65%),
+        var(--bg);
+      font-family: "Segoe UI", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      line-height: 1.65;
+    }
+
+    a { color: inherit; }
+
+    .wrap {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .hero {
+      padding: 88px 0 54px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .eyebrow {
+      color: var(--accent);
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 14px 0 8px;
+      font-size: clamp(42px, 7vw, 76px);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+    }
+
+    .role {
+      margin: 0;
+      color: var(--accent-2);
+      font-size: clamp(18px, 2.5vw, 24px);
+      font-weight: 600;
+    }
+
+    .intro {
+      max-width: 760px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .btn:hover {
+      border-color: rgba(111, 155, 255, 0.65);
+      background: rgba(111, 155, 255, 0.13);
+      transform: translateY(-1px);
+    }
+
+    .btn.primary {
+      border-color: rgba(111, 155, 255, 0.55);
+      background: linear-gradient(135deg, rgba(111, 155, 255, 0.95), rgba(72, 111, 210, 0.95));
+      color: #fff;
+    }
+
+    main { padding: 54px 0 80px; }
+
+    .project {
+      margin-bottom: 42px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(18, 26, 42, 0.94), rgba(12, 17, 28, 0.94));
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+    }
+
+    .project-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .project h2 {
+      margin: 0;
+      font-size: clamp(24px, 3.2vw, 34px);
+      letter-spacing: -0.02em;
+    }
+
+    .year {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.12em;
+    }
+
+    .project-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 26px;
+      align-items: start;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 0 0 14px;
+    }
+
+    .tag {
+      padding: 4px 9px;
+      border: 1px solid rgba(111, 155, 255, 0.28);
+      border-radius: 999px;
+      color: var(--accent-2);
+      background: rgba(111, 155, 255, 0.08);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .desc {
+      margin: 0 0 14px;
+      color: #c7d0e2;
+      font-size: 14px;
+    }
+
+    .points {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .points li {
+      position: relative;
+      margin: 0 0 7px;
+      padding-left: 16px;
+    }
+
+    .points li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.66em;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .project-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .cover {
+      display: block;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #0a0e16;
+      text-decoration: none;
+    }
+
+    .cover img {
+      display: block;
+      width: 100%;
+      height: auto;
+      transition: transform 0.35s ease, opacity 0.2s ease;
+    }
+
+    .cover:hover img { transform: scale(1.015); opacity: 0.92; }
+
+    .hint {
+      margin: 8px 0 0;
+      color: #77849a;
+      font-size: 11px;
+      text-align: right;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .shot {
+      display: block;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #0a0e16;
+      text-decoration: none;
+    }
+
+    .shot img {
+      display: block;
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      object-position: top;
+      transition: transform 0.3s ease, opacity 0.2s ease;
+    }
+
+    .shot:hover img { transform: scale(1.035); opacity: 0.9; }
+
+    .shot span {
+      display: block;
+      padding: 7px 9px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .note {
+      margin: 12px 0 0;
+      color: #77849a;
+      font-size: 12px;
+    }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 24px 0 40px;
+      color: #6f7c91;
+      font-size: 12px;
+    }
+
+    footer .wrap {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    @media (max-width: 840px) {
+      .hero { padding-top: 58px; }
+      .project { padding: 20px; }
+      .project-grid { grid-template-columns: 1fr; }
+      .gallery { grid-template-columns: repeat(2, 1fr); }
+      .shot img { height: 140px; }
+    }
+
+    @media (max-width: 480px) {
+      .wrap { width: min(100% - 26px, 1120px); }
+      .gallery { grid-template-columns: 1fr; }
+      .shot img { height: 190px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div class="eyebrow">PORTFOLIO · 2026</div>
+      <h1>张道银</h1>
+      <p class="role">测试开发 / 自动化测试 · Python / AI 应用</p>
+      <p class="intro">
+        两个个人项目：一个偏 AI 应用与 Python 后端，一个偏接口测试工程化。
+        截图均可点击查看原图，项目源码在 GitHub。
+      </p>
+      <div class="actions">
+        <a class="btn primary" href="#projects">查看项目</a>
+        <a class="btn" href="https://github.com/ZHANGg236/ai-code-review-assistant" target="_blank" rel="noopener">AI 项目仓库 ↗</a>
+        <a class="btn" href="https://github.com/ZHANGg236/pytest-api-framework" target="_blank" rel="noopener">Pytest 框架仓库 ↗</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="projects" class="wrap">
+    <section class="project">
+      <div class="project-top">
+        <h2>AI 代码审查助手</h2>
+        <span class="year">FASTAPI · SSE · SQLITE · DOCKER</span>
+      </div>
+
+      <div class="project-grid">
+        <div>
+          <div class="tags">
+            <span class="tag">FastAPI</span>
+            <span class="tag">SSE</span>
+            <span class="tag">SQLite</span>
+            <span class="tag">Docker</span>
+            <span class="tag">GitHub Actions</span>
+          </div>
+          <p class="desc">
+            面向个人开发者和小团队的 AI 代码审查服务。支持快速 / 深度 / 修复三种模式，
+            以及编程题评测、自动化测试脚本审查和 zip 文件夹分析。
+          </p>
+          <ul class="points">
+            <li>SSE 流式输出，先给结论和 Top 3 问题，降低等待时间</li>
+            <li>SQLite 保存审查历史与反馈，按语言聚合后注入后续 Prompt</li>
+            <li>zip 文件夹过滤敏感文件，按 Python/pytest import 生成 Bundle</li>
+            <li>Docker + Caddy 部署，GitHub Actions 覆盖编译和前端语法</li>
+          </ul>
+          <div class="project-links">
+            <a class="btn primary" href="https://github.com/ZHANGg236/ai-code-review-assistant" target="_blank" rel="noopener">查看源码 ↗</a>
+            <a class="btn" href="screenshots/ai-review.png" target="_blank" rel="noopener">打开审查截图 ↗</a>
+          </div>
+        </div>
+
+        <div>
+          <a class="cover" href="screenshots/ai-review.png" target="_blank" rel="noopener" title="点击查看大图">
+            <img src="screenshots/ai-review.png" alt="AI 代码审查结果截图">
+          </a>
+          <p class="hint">点击截图查看原图</p>
+        </div>
+      </div>
+
+      <div class="gallery">
+        <a class="shot" href="screenshots/ai-home.png" target="_blank" rel="noopener">
+          <img src="screenshots/ai-home.png" alt="AI 项目首页">
+          <span>首页 · 点击查看</span>
+        </a>
+        <a class="shot" href="screenshots/ai-review.png" target="_blank" rel="noopener">
+          <img src="screenshots/ai-review.png" alt="AI 审查结果">
+          <span>审查结果 · 点击查看</span>
+        </a>
+        <a class="shot" href="screenshots/ai-history.png" target="_blank" rel="noopener">
+          <img src="screenshots/ai-history.png" alt="审查历史与反馈">
+          <span>历史与反馈 · 点击查看</span>
+        </a>
+        <a class="shot" href="screenshots/ai-folder.png" target="_blank" rel="noopener">
+          <img src="screenshots/ai-folder.png" alt="文件夹分析报告">
+          <span>文件夹分析 · 点击查看</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="project">
+      <div class="project-top">
+        <h2>Pytest 接口自动化测试框架</h2>
+        <span class="year">PYTEST · YAML · JSON SCHEMA · CI</span>
+      </div>
+
+      <div class="project-grid">
+        <div>
+          <div class="tags">
+            <span class="tag">Python</span>
+            <span class="tag">pytest</span>
+            <span class="tag">requests</span>
+            <span class="tag">YAML</span>
+            <span class="tag">JSON Schema</span>
+            <span class="tag">GitHub Actions</span>
+          </div>
+          <p class="desc">
+            分层、可配置、数据驱动的接口自动化框架。默认测试 JSONPlaceholder，
+            改 base_url 即可接入自己的 API。
+          </p>
+          <ul class="points">
+            <li>config / data / framework / tests 分层，配置、数据、请求和用例解耦</li>
+            <li>session fixture 复用 HTTP 会话，统一超时、5xx 重试和请求日志</li>
+            <li>YAML 参数化 + JSON Schema + 状态码/字段/响应时间多层断言</li>
+            <li>9 条接口用例全部通过，GitHub Actions 自动执行并上传 HTML 报告</li>
+          </ul>
+          <div class="project-links">
+            <a class="btn primary" href="https://github.com/ZHANGg236/pytest-api-framework" target="_blank" rel="noopener">查看源码 ↗</a>
+            <a class="btn" href="screenshots/pytest-report.png" target="_blank" rel="noopener">打开测试报告截图 ↗</a>
+          </div>
+        </div>
+
+        <div>
+          <a class="cover" href="screenshots/pytest-report.png" target="_blank" rel="noopener" title="点击查看大图">
+            <img src="screenshots/pytest-report.png" alt="Pytest HTML 测试报告">
+          </a>
+          <p class="hint">点击截图查看原图</p>
+        </div>
+      </div>
+
+      <p class="note">截图使用演示数据；AI 项目未包含真实 API Key、密码和本地数据库。</p>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>张道银 · 项目作品集</span>
+      <span>截图可点击查看原图 · 源码见 GitHub</span>
+    </div>
+  </footer>
+</body>
+</html>
