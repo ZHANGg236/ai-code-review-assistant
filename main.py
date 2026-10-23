@@ -7,6 +7,7 @@ from pathlib import Path
 
 import httpx
 import requests
+from dotenv import load_dotenv
 from fastapi import FastAPI, File, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
@@ -29,6 +30,7 @@ logger = logging.getLogger("uvicorn.error")
 
 BASE_DIR = Path(__file__).resolve().parent
 STATIC_DIR = BASE_DIR / "static"
+load_dotenv(BASE_DIR / ".env")
 
 
 def env_int(name: str, default: int) -> int:
